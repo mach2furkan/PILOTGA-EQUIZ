@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pilotage Knowledge Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #0d47a1, #64b5f6);
+      color: #ffffff;
+      overflow: hidden;
+    }
+    .container {
+      width: 80%;
+      margin: auto;
+      text-align: center;
+    }
+    h1 {
+      margin-top: 20px;
+      font-size: 2.5rem;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 20px;
+      font-size: 1.2rem;
+      color: #ffffff;
+      background-color: #1e88e5;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #1565c0;
+    }
+    .quiz-container {
+      display: none;
+    }
+    .question {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    .answers {
+      margin-bottom: 20px;
+    }
+    .answer {
+      display: block;
+      margin: 10px 0;
+    }
+    .results {
+      display: none;
+      margin-top: 20px;
+    }
+    .feedback {
+      font-size: 1rem;
+      margin-top: 10px;
+      color: yellow;
+    }
+    .plane {
+      position: absolute;
+      top: 50%;
+      left: -100px;
+      width: 100px;
+      transform: translateY(-50%);
+      animation: fly 10s linear infinite;
+    }
+    @keyframes fly {
+      0% {
+        left: -100px;
+      }
+      100% {
+        left: 110%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="landing-page">
+    <h1>Pilotage QUIZIMIZ ASKIM</h1>
+    <p>Test your aviation knowledge in navigation, weather, and regulations!</p>
+    <button class="btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <div class="quiz-container">
+    <div class="question"></div>
+    <div class="answers"></div>
+    <div class="feedback"></div>
+    <button class="btn" onclick="prevQuestion()">Previous</button>
+    <button class="btn" onclick="nextQuestion()">Next</button>
+  </div>
+
+  <div class="results">
+    <h2>Quiz Results</h2>
+    <p class="score"></p>
+    <button class="btn" onclick="restartQuiz()">Restart Quiz</button>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    { question: "What does a dashed magenta line on a sectional chart represent?", options: ["Controlled airspace", "Military operations area", "Class E airspace starting at the surface", "Prohibited area"], answer: 2 },
+
+    { question: "In a METAR, what does 'OVC020' indicate?", options: ["Clear skies", "Overcast clouds at 2,000 feet", "Overcast clouds at 20,000 feet", "Scattered clouds at 2,000 feet"], answer: 1 },
+    { question: "What is the purpose of the pitot-static system?", options: ["Measure fuel levels", "Control cabin pressure", "Provide airspeed, altitude, and vertical speed readings", "Regulate hydraulic systems"], answer: 2 },
+    { question: "What is the minimum visibility for VFR flight in Class G airspace at night?", options: ["1 mile", "3 miles", "5 miles", "10 miles"], answer: 1 },
+    { question: "What does the abbreviation 'IFR' stand for?", options: ["Instrument Flight Rules", "Internal Flight Regulations", "Integrated Flight Resources", "Instantaneous Flight Readings"], answer: 0 },
+    { question: "What is the primary purpose of an ELT (Emergency Locator Transmitter)?", options: ["Transmit location in an emergency", "Provide navigation data", "Control autopilot", "Monitor engine performance"], answer: 0 },
+    { question: "What does a solid blue line on a sectional chart represent?", options: ["Class B airspace", "Class D airspace", "Restricted area", "Class C airspace"], answer: 0 },
+    { question: "What is the standard temperature lapse rate in the troposphere?", options: ["2°C per 1,000 feet", "3°C per 1,000 feet", "4°C per 1,000 feet", "5°C per 1,000 feet"], answer: 0 },
+    { question: "What is the meaning of 'QNH' in aviation?", options: ["Sea level pressure", "Current temperature", "Wind direction", "Visibility"], answer: 0 },
+    { question: "What does 'SIGMET' refer to in weather reporting?", options: ["Significant meteorological information", "Radar summary", "Surface weather observations", "Aerodrome forecast"], answer: 0 },
+    { question: "What is the standard pressure at sea level in inches of mercury?", options: ["29.92", "30.12", "28.92", "30.00"], answer: 0 },
+    { question: "What is the main function of a transponder in an aircraft?", options: ["Identify aircraft to ATC", "Navigate to destination", "Monitor engine health", "Provide weather data"], answer: 0 },
+    { question: "What is the purpose of the ailerons on an aircraft?", options: ["Control pitch", "Control roll", "Control yaw", "Increase lift"], answer: 1 },
+    { question: "What is the effect of high density altitude on aircraft performance?", options: ["Improved engine power", "Decreased climb performance", "Increased lift", "Reduced takeoff roll"], answer: 1 },
+    { question: "What color are runway edge lights at night?", options: ["White", "Blue", "Green", "Yellow"], answer: 0 },
+    { question: "What is the main function of a VOR (VHF Omnidirectional Range)?", options: ["Provide weather information", "Transmit navigation signals", "Monitor aircraft systems", "Indicate airspeed"], answer: 1 },
+    { question: "What is the purpose of a NOTAM (Notice to Airmen)?", options: ["Provide updated aeronautical information", "Summarize weather conditions", "Report pilot deviations", "Define ATC procedures"], answer: 0 },
+    { question: "What is the primary risk of carburetor icing?", options: ["Engine overheating", "Reduced lift", "Engine failure", "Navigation errors"], answer: 2 },
+    { question: "What does a green and white rotating beacon at an airport indicate?", options: ["Military airport", "Heliport", "Civilian airport", "Water airport"], answer: 2 },
+    { question: "What is the function of the rudder on an aircraft?", options: ["Control roll", "Control yaw", "Control pitch", "Increase speed"], answer: 1 },
+    { question: "What does 'VX' represent in aviation performance?", options: ["Best rate of climb", "Best angle of climb", "Maximum glide distance", "Best cruising speed"], answer: 1 },
+    { question: "What does the 'transitional altitude' signify?", options: ["Altitude where VFR becomes mandatory", "Level to switch altimeter to standard pressure", "Minimum altitude for IFR flights", "Maximum altitude for VFR flights"], answer: 1 },
+    { question: "What is the primary purpose of flaps on an aircraft?", options: ["Increase lift during takeoff and landing", "Control yaw", "Increase speed", "Improve navigation"], answer: 0 },
+    { question: "What does a white and green rotating beacon at an airport signify at night?", options: ["Military airport", "Civilian airport", "Heliport", "Water airport"], answer: 1 },
+    { question: "What does 'TAF' stand for in aviation weather?", options: ["Terminal Aerodrome Forecast", "Turbulence and Flight Forecast", "Temporary Aviation Forecast", "Terminal Airway Forecast"], answer: 0 },
+    { question: "What is the purpose of the altimeter in an aircraft?", options: ["Measure speed", "Measure altitude", "Measure pitch", "Measure heading"], answer: 1 },
+    { question: "What is the main purpose of the turn coordinator?", options: ["Indicate yaw", "Indicate pitch", "Indicate roll and yaw coordination", "Indicate altitude"], answer: 2 },
+    { question: "What is the standard holding pattern turn direction unless specified otherwise?", options: ["Left", "Right", "Up", "Down"], answer: 1 },
+    { question: "What is the meaning of the abbreviation 'VOR/DME'?", options: ["VOR with Distance Measuring Equipment", "Visual Operation Required", "Vertical Orientation Radar", "Velocity Oriented Range"], answer: 0 },
+    { question: "What is the minimum safe altitude over a congested area?", options: ["500 feet above the highest obstacle", "1,000 feet above the highest obstacle within a 2,000-foot radius", "1,500 feet above ground level", "2,000 feet above ground level"], answer: 1 },
+    { question: "What is the function of an APU (Auxiliary Power Unit)?", options: ["Provide backup thrust", "Generate electrical power on the ground", "Control cabin temperature", "Manage hydraulic systems"], answer: 1 },
+    { question: "What is the ICAO phonetic alphabet code for the letter 'N'?", options: ["November", "Nile", "Nancy", "Neptune"], answer: 0 },
+    { question: "What is the primary risk associated with wake turbulence?", options: ["Reduced engine power", "Loss of control", "Decreased airspeed", "Increased fuel consumption"], answer: 1 },
+    { question: "What is the primary function of spoilers on an aircraft?", options: ["Increase lift", "Reduce speed", "Increase thrust", "Enhance roll"], answer: 1 },
+    { question: "What is the purpose of the airspeed indicator?", options: ["Measure ground speed", "Measure indicated airspeed", "Measure altitude", "Measure vertical speed"], answer: 1 },
+    { question: "What is the purpose of the stall warning system?", options: ["Indicate impending stall", "Indicate overspeed condition", "Indicate altitude deviation", "Indicate engine failure"], answer: 0 },
+    { question: "What is the primary risk of overloading an aircraft?", options: ["Improved takeoff performance", "Structural damage and poor performance", "Reduced stall speed", "Enhanced fuel efficiency"], answer: 1 },
+    { question: "What does 'ETA' stand for in aviation?", options: ["Estimated Time of Arrival", "Exact Time of Arrival", "Elapsed Time in Air", "Emergency Time Adjustment"], answer: 0 },
+    { question: "What is the function of a wind sock at an airport?", options: ["Measure visibility", "Indicate wind direction and speed", "Signal runway length", "Measure altitude"], answer: 1 }
+  ];
+
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+
+  function startQuiz() {
+    document.querySelector('.landing-page').style.display = 'none';
+    document.querySelector('.quiz-container').style.display = 'block';
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const questionEl = document.querySelector('.question');
+    const answersEl = document.querySelector('.answers');
+    const feedbackEl = document.querySelector('.feedback');
+    const question = questions[currentQuestionIndex];
+
+    questionEl.textContent = `Question ${currentQuestionIndex + 1}: ${question.question}`;
+    answersEl.innerHTML = '';
+    feedbackEl.textContent = '';
+
+    question.options.forEach((option, index) => {
+      const button = document.createElement('button');
+      button.textContent = option;
+      button.className = 'btn answer';
+      button.onclick = () => checkAnswer(index);
+      answersEl.appendChild(button);
+    });
+  }
+
+  function checkAnswer(selectedIndex) {
+    const feedbackEl = document.querySelector('.feedback');
+    if (selectedIndex === questions[currentQuestionIndex].answer) {
+      feedbackEl.textContent = 'Correct!';
+      feedbackEl.style.color = 'lime';
+      score++;
+    } else {
+      feedbackEl.textContent = `Wrong! The correct answer is: ${questions[currentQuestionIndex].options[questions[currentQuestionIndex].answer]}`;
+      feedbackEl.style.color = 'red';
+    }
+  }
+
+  function nextQuestion() {
+    if (currentQuestionIndex < questions.length - 1) {
+      currentQuestionIndex++;
+      showQuestion();
+    } else {
+      showResults();
+    }
+  }
+
+  function prevQuestion() {
+    if (currentQuestionIndex > 0) {
+      currentQuestionIndex--;
+      showQuestion();
+    }
+  }
+
+  function showResults() {
+    document.querySelector('.quiz-container').style.display = 'none';
+    const resultsEl = document.querySelector('.results');
+    resultsEl.style.display = 'block';
+    resultsEl.querySelector('.score').textContent = `You scored ${score} out of ${questions.length}.`;
+  }
+
+  function restartQuiz() {
+    score = 0;
+    currentQuestionIndex = 0;
+    document.querySelector('.results').style.display = 'none';
+    document.querySelector('.landing-page').style.display = 'block';
+  }
+</script>
+</body>
+</html>
